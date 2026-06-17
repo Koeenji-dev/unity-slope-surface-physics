@@ -1,0 +1,16 @@
+{
+  "name": "KoeenjiDev.SlopeSurfacePhysics",
+  "rootNamespace": "KoeenjiDev.SlopeSurfacePhysics",
+  "references": [
+    "KoeenjiDev.PlayerVisual"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
