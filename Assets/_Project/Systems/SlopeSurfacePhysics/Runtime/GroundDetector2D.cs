@@ -26,20 +26,30 @@ namespace KoeenjiDev.SlopeSurfacePhysics
         [SerializeField, Min(0f)]
         private float groundCheckDistance = 0.08f;
 
-        [Tooltip("Maximum upward velocity at which the player is still considered grounded.")]
+        [Tooltip("Maximum slope angle in degrees that counts as walkable ground.")]
         [SerializeField, Min(0f)]
-        private float groundedVerticalTolerance = 0.1f;
+        private float maxWalkableSlopeAngle = 45f;
+
+        [Tooltip("Maximum outward velocity along the contact normal at which the player is still considered grounded.")]
+        [SerializeField, Min(0f)]
+        private float groundedNormalVelocityTolerance = 0.25f;
 
         // ── Public state ──────────────────────────────────────────────────────
 
         /// <summary>True when the capsule cast detected a supporting collider below the Player.</summary>
         public bool HasGroundContact { get; private set; }
 
+        /// <summary>True when HasGroundContact is true and the detected surface angle is within MaxWalkableSlopeAngle.</summary>
+        public bool IsGroundWalkable { get; private set; }
+
         /// <summary>
-        /// True when HasGroundContact is true and vertical velocity is within
-        /// the grounded tolerance (player is not jumping away from the surface).
+        /// True when HasGroundContact is true, the surface is walkable, and the player
+        /// is not moving away from the surface along its normal (not jumping).
         /// </summary>
         public bool IsGrounded { get; private set; }
+
+        /// <summary>The maximum slope angle in degrees that counts as walkable ground.</summary>
+        public float MaxWalkableSlopeAngle => maxWalkableSlopeAngle;
 
         /// <summary>Full contact snapshot from the most recent UpdateGroundState call.</summary>
         public GroundContactData2D ContactData { get; private set; }
@@ -79,13 +89,12 @@ namespace KoeenjiDev.SlopeSurfacePhysics
             );
 
             HasGroundContact = hit.collider != null;
-            IsGrounded       = HasGroundContact && body.linearVelocity.y <= groundedVerticalTolerance;
 
             if (HasGroundContact)
             {
                 float angle = Vector2.Angle(hit.normal, Vector2.up);
 
-                ContactData = new GroundContactData2D(
+                ContactData      = new GroundContactData2D(
                     hit.point,
                     hit.normal,
                     angle,
@@ -93,10 +102,18 @@ namespace KoeenjiDev.SlopeSurfacePhysics
                     hit.collider,
                     hit.rigidbody
                 );
+
+                IsGroundWalkable = GroundAngle <= maxWalkableSlopeAngle;
+
+                // Positive normalVelocity means the player is moving away from the surface.
+                float normalVelocity = Vector2.Dot(body.linearVelocity, ContactNormal);
+                IsGrounded = IsGroundWalkable && normalVelocity <= groundedNormalVelocityTolerance;
             }
             else
             {
-                ContactData = GroundContactData2D.None;
+                ContactData      = GroundContactData2D.None;
+                IsGroundWalkable = false;
+                IsGrounded       = false;
             }
         }
 
@@ -133,8 +150,11 @@ namespace KoeenjiDev.SlopeSurfacePhysics
             if (groundCheckDistance < 0f)
                 groundCheckDistance = 0f;
 
-            if (groundedVerticalTolerance < 0f)
-                groundedVerticalTolerance = 0f;
+            if (maxWalkableSlopeAngle < 0f)
+                maxWalkableSlopeAngle = 0f;
+
+            if (groundedNormalVelocityTolerance < 0f)
+                groundedNormalVelocityTolerance = 0f;
         }
     }
 }

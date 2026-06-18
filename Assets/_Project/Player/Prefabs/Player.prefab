@@ -133,8 +133,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.05}
-  m_Size: {x: 0.5, y: 1.06}
+  m_Offset: {x: 0, y: -0.02}
+  m_Size: {x: 0.5, y: 1.15}
   m_Direction: 0
 --- !u!114 &2326760244070206929
 MonoBehaviour:
@@ -244,7 +244,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   groundCheckDistance: 0.08
-  groundedVerticalTolerance: 0.1
+  maxWalkableSlopeAngle: 45
+  groundedNormalVelocityTolerance: 0.25
 --- !u!114 &-2785146881063931733
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -263,6 +264,7 @@ MonoBehaviour:
   maximumSpeed: 7
   groundAcceleration: 45
   groundDeceleration: 55
+  uphillSpeedMultiplier: 0.85
   jumpSpeed: 12
   gravityAcceleration: 35
   maximumFallSpeed: 20

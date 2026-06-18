@@ -5,9 +5,10 @@ using UnityEngine.InputSystem;
 namespace KoeenjiDev.SlopeSurfacePhysics
 {
     /// <summary>
-    /// Receives player input and applies horizontal movement, code-controlled
-    /// gravity, and a simple vertical jump to the Player Rigidbody2D.
-    /// Forwards motion state to PlayerVisualController2D after each physics step.
+    /// Receives player input and applies movement, code-controlled gravity, and a
+    /// simple vertical jump to the Player Rigidbody2D. When grounded on walkable
+    /// ground, movement is projected onto the surface tangent. Forwards motion state
+    /// to PlayerVisualController2D after each physics step.
     /// </summary>
     public sealed class PlayerSlopeController2D : MonoBehaviour
     {
@@ -34,6 +35,10 @@ namespace KoeenjiDev.SlopeSurfacePhysics
         [SerializeField, Min(0f)]
         private float groundDeceleration = 55f;
 
+        [Tooltip("Fraction of maximum speed applied when moving uphill on a walkable slope. 1 means no reduction.")]
+        [SerializeField, Range(0.1f, 1f)]
+        private float uphillSpeedMultiplier = 0.85f;
+
         [Header("Jump")]
         [Tooltip("Vertical speed assigned immediately on jump, in units/s.")]
         [SerializeField, Min(0f)]
@@ -50,6 +55,7 @@ namespace KoeenjiDev.SlopeSurfacePhysics
 
         private float horizontalInput;
         private bool jumpRequested;
+        private float movementSpeed;
 
         public void OnMove(InputAction.CallbackContext context)
         {
@@ -73,40 +79,77 @@ namespace KoeenjiDev.SlopeSurfacePhysics
             // 2. Read current velocity.
             Vector2 velocity = body.linearVelocity;
 
-            // 3. Horizontal movement.
+            // 3. Jump — only from grounded state.
+            bool jumped = jumpRequested && groundDetector.IsGrounded;
+
+            // 4. Apply movement along the surface tangent or global X.
+            if (groundDetector.IsGrounded && !jumped)
+                velocity = ApplyGroundMovement(velocity);
+            else
+                velocity = ApplyAirMovement(velocity, jumped);
+
+            // 5. Single velocity assignment.
+            body.linearVelocity = velocity;
+
+            // 6. Consume the jump request regardless of outcome.
+            jumpRequested = false;
+
+            // 7. Forward final velocity and ground state to the visual module.
+            UpdateVisualState();
+        }
+
+        private Vector2 ApplyGroundMovement(Vector2 velocity)
+        {
+            Vector2 slopeDirection = GetGroundMovementDirection();
+
+            float targetSpeed = horizontalInput * maximumSpeed;
+
+            // Moving uphill means the actual travel direction has a positive Y component.
+            Vector2 actualMoveDirection = slopeDirection * Mathf.Sign(targetSpeed);
+            if (actualMoveDirection.y > 0.01f)
+                targetSpeed *= uphillSpeedMultiplier;
+
+            // Project current velocity onto the slope to get the scalar starting point.
+            float currentSpeed = Vector2.Dot(velocity, slopeDirection);
+            float rate = Mathf.Approximately(horizontalInput, 0f)
+                ? groundDeceleration
+                : groundAcceleration;
+
+            movementSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, rate * Time.fixedDeltaTime);
+
+            // Fully define velocity along the surface; no gravity while grounded.
+            return slopeDirection * movementSpeed;
+        }
+
+        private Vector2 ApplyAirMovement(Vector2 velocity, bool jumped)
+        {
             float targetVelocityX = horizontalInput * maximumSpeed;
             float rate = Mathf.Approximately(horizontalInput, 0f)
                 ? groundDeceleration
                 : groundAcceleration;
-            velocity.x = Mathf.MoveTowards(
-                velocity.x,
-                targetVelocityX,
-                rate * Time.fixedDeltaTime
-            );
 
-            // 4. Jump — only from grounded state.
-            bool jumped = false;
-            if (jumpRequested && groundDetector.IsGrounded)
+            movementSpeed = Mathf.MoveTowards(velocity.x, targetVelocityX, rate * Time.fixedDeltaTime);
+            velocity.x = movementSpeed;
+
+            if (jumped)
             {
                 velocity.y = jumpSpeed;
-                jumped = true;
+            }
+            else
+            {
+                velocity.y -= gravityAcceleration * Time.fixedDeltaTime;
             }
 
-            // 5. Apply gravity only when no jump occurred this step.
-            if (!jumped)
-                velocity.y -= gravityAcceleration * Time.fixedDeltaTime;
-
-            // 6. Clamp fall speed.
             velocity.y = Mathf.Max(velocity.y, -maximumFallSpeed);
+            return velocity;
+        }
 
-            // 7. Single velocity assignment.
-            body.linearVelocity = velocity;
-
-            // 8. Consume the jump request regardless of outcome.
-            jumpRequested = false;
-
-            // 9. Forward final velocity and ground state to the visual module.
-            UpdateVisualState();
+        // Returns the slope tangent reoriented so its X component is always positive,
+        // meaning positive movementSpeed always drives the player to the right.
+        private Vector2 GetGroundMovementDirection()
+        {
+            Vector2 dir = groundDetector.GroundTangent;
+            return dir.x < 0f ? -dir : dir;
         }
 
         private void UpdateVisualState()
@@ -114,11 +157,9 @@ namespace KoeenjiDev.SlopeSurfacePhysics
             if (playerVisual == null)
                 return;
 
-            Vector2 velocity = body.linearVelocity;
-
             playerVisual.SetMotionState(
-                Mathf.Abs(velocity.x),
-                velocity.y,
+                Mathf.Abs(movementSpeed),
+                body.linearVelocity.y,
                 groundDetector.IsGrounded
             );
 
