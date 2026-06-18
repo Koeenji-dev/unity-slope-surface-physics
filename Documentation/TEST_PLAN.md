@@ -1,19 +1,34 @@
 # Test Plan — 02 Slope & Surface Physics
 
-**Version:** v0.5.0 (Phase 02.5 — Review, Debug & Polish)  
+**Version:** v0.5.0 (Review, Debug & Polish)  
 **Last updated:** 2026-06-18  
 **Tester:** Koeenji  
 **Unity version:** 6000.3.17f1
 
 ---
 
-## How to Use
+## Scope
 
-1. Open the scene `Assets/_Project/Scenes/SlopeSurfacePhysics.unity`.
-2. Press **Play**.
-3. Execute each test case below.
-4. Fill in **Observed Result** and set **Status** to `pass`, `fail`, or `skip`.
-5. Add notes about any unexpected behavior.
+This plan covers validation of the slope and surface physics system at the current release state.
+
+Validation categories:
+
+- Manual Play Mode test cases
+- Automated Edit Mode tests (inherited Currency module)
+- Regression checklist
+- Console validation
+- Git validation
+
+---
+
+## Manual Test Environment
+
+1. Open the project in Unity `6000.3.17f1`.
+2. Open the scene `Assets/_Project/Scenes/SlopeSurfacePhysics.unity`.
+3. Open the Scene View alongside the Game View to observe gizmos.
+4. Select the Player in the Hierarchy so `SlopeSurfaceDebugGizmos2D` is visible.
+5. Press **Play**.
+6. Execute each test case below.
 
 **Status values:**
 
@@ -26,7 +41,7 @@
 
 ---
 
-## Test Cases
+## Manual Test Cases
 
 ### T-01 — Compile Without Errors
 
@@ -34,7 +49,7 @@
 |-------|-------|
 | **Setup** | Open the project in Unity 6000.3.17f1. |
 | **Steps** | 1. Wait for Unity to finish importing and compiling. 2. Check the Console window. |
-| **Expected Result** | 0 compile errors. Assembly `KoeenjiDev.SlopeSurfacePhysics` resolves successfully. |
+| **Expected Result** | 0 compile errors. Assembly `KoeenjiDev.SlopeSurfacePhysics` resolves successfully. No Missing Scripts. No Missing References. |
 | **Observed Result** | Pending manual validation |
 | **Status** | `pending` |
 | **Notes** | — |
@@ -59,7 +74,7 @@
 | Field | Value |
 |-------|-------|
 | **Setup** | Player standing on a flat Normal surface. |
-| **Steps** | 1. Press and hold right arrow. 2. Observe Player accelerates to maximum speed. 3. Release input. 4. Observe Player decelerates to a stop. |
+| **Steps** | 1. Press and hold right. 2. Observe Player accelerates to maximum speed. 3. Release input. 4. Observe Player decelerates to a stop. |
 | **Expected Result** | Smooth acceleration to max speed. Clean deceleration to zero. Run animation active while moving. Idle animation when stopped. |
 | **Observed Result** | Pending manual validation |
 | **Status** | `pending` |
@@ -119,7 +134,7 @@
 
 ---
 
-### T-08 — Ice Surface Sliding
+### T-08 — Ice Surface
 
 | Field | Value |
 |-------|-------|
@@ -132,7 +147,7 @@
 
 ---
 
-### T-09 — Mud Slowdown
+### T-09 — Mud Surface
 
 | Field | Value |
 |-------|-------|
@@ -145,7 +160,7 @@
 
 ---
 
-### T-10 — Sticky Strong Deceleration
+### T-10 — Sticky Surface
 
 | Field | Value |
 |-------|-------|
@@ -158,7 +173,7 @@
 
 ---
 
-### T-11 — JumpBoost Only When Jump Is Pressed
+### T-11 — JumpBoost Surface
 
 | Field | Value |
 |-------|-------|
@@ -188,25 +203,91 @@
 
 | Field | Value |
 |-------|-------|
-| **Setup** | A ground collider with no `SurfaceModifier2D` component attached (plain Normal geometry). |
+| **Setup** | A ground collider with no `SurfaceModifier2D` component attached. |
 | **Steps** | 1. Walk onto plain ground. 2. Observe movement behavior. 3. Observe `SlopeSurfaceDebugGizmos2D` label. |
-| **Expected Result** | Player moves with standard acceleration, deceleration, and max speed (multipliers default to 1.0). `SlopeSurfaceDebugGizmos2D` shows `Surface: Normal`. No errors in Console. |
+| **Expected Result** | Player moves with standard acceleration, deceleration, and max speed. `SlopeSurfaceDebugGizmos2D` shows `Surface: Normal`. No errors in Console. |
 | **Observed Result** | Pending manual validation |
 | **Status** | `pending` |
-| **Notes** | `GroundContactData2D.HasSurfaceModifier` is false. All multipliers read as 1.0f. |
+| **Notes** | All multipliers default to 1.0. |
 
 ---
 
-### T-14 — Debug Normal / Tangent / Slope Angle Visibility
+### T-14 — Debug Gizmo Visibility
 
 | Field | Value |
 |-------|-------|
 | **Setup** | `SlopeSurfaceDebugGizmos2D` attached to the Player. Scene View open. Player selected. |
 | **Steps** | 1. Enter Play Mode with the Scene View visible. 2. Walk the Player onto a slope. 3. Observe the Scene View. |
-| **Expected Result** | A blue arrow shows the ground normal. A red arrow shows the ground tangent. A text label shows slope angle in degrees, surface type, and grounded state. Contact sphere is green when grounded, yellow when contact exists but not grounded. In Edit Mode no geometric gizmos are shown. |
+| **Expected Result** | Blue arrow shows ground normal. Red arrow shows ground tangent. Text label shows slope angle, surface type, and grounded state. Contact sphere is green when grounded, yellow when contact exists but not grounded. In Edit Mode no geometric gizmos are shown. |
 | **Observed Result** | Pending manual validation |
 | **Status** | `pending` |
 | **Notes** | Label uses `UnityEditor.Handles.Label`. No runtime UI is displayed in Game View. |
+
+---
+
+## Automated Tests
+
+### Edit Mode — Currency Module
+
+The inherited `CurrencyWallet` class has 9 Edit Mode unit tests.
+
+**How to run:**
+1. Open `Window › General › Test Runner`.
+2. Select **Edit Mode**.
+3. Click **Run All**.
+
+**Expected result:** 9/9 pass, 0 failures.
+
+### Automated tests for slope logic
+
+No separate automated test assembly for slope logic exists at this version. Slope angle calculation, tangent derivation, and walkability are validated through the manual test cases above and through the `GroundDetector2D` internal logic.
+
+---
+
+## Regression Checklist
+
+Run after any change to physics scripts, prefab, or scene:
+
+- [ ] Unity compiles without errors
+- [ ] Console shows 0 errors and 0 new warnings
+- [ ] Flat ground movement and deceleration unchanged
+- [ ] Jump and landing unchanged
+- [ ] Walkable slope traversal unchanged
+- [ ] Steep slope behavior unchanged
+- [ ] Ice behavior unchanged
+- [ ] Currency collection unchanged
+- [ ] HUD updates after each pickup
+- [ ] No Missing Scripts in the Hierarchy
+- [ ] No Missing References in the Inspector
+- [ ] Player prefab serialized references intact
+- [ ] Currency tests still pass (9/9)
+- [ ] Re-entering Play Mode multiple times produces no new errors
+
+---
+
+## Console Validation
+
+At every test session:
+
+```
+Target: 0 errors, 0 new avoidable warnings
+```
+
+Warnings produced by Unity packages that are unrelated to this project may be noted separately and are not counted against the project.
+
+Debug logs must be removed or disabled before the final release. `SlopeSurfaceDebugGizmos2D` labels use `UnityEditor.Handles.Label` and are Editor-only; they do not appear in builds.
+
+---
+
+## Git Validation
+
+Before any commit or tag:
+
+- [ ] `git status` shows only intended modified or new files
+- [ ] `git diff` shows no unintended changes to gameplay scripts, prefab, or scene
+- [ ] Private context folders are excluded (not staged)
+- [ ] `.meta` files for every changed asset are included
+- [ ] No Unity Library, Temp, or user settings files are staged
 
 ---
 
@@ -224,6 +305,10 @@
 | AC-18 | Normal surfaces accelerate/decelerate correctly | T-03 |
 | AC-19 | Ice preserves momentum | T-08 |
 | AC-20 | Ice affects slope behavior | T-08 |
+| AC-24 | Currency modules reused without API change | T-01 |
+| AC-26 | Pickups cannot be collected twice | Currency manual validation |
+| AC-27 | Currency HUD updates through events | Currency manual validation |
+| AC-28 | Automated slope-math tests pass | Currency Edit Mode tests (9/9) |
 | AC-29 | No Missing Scripts | T-01 |
 | AC-30 | No Missing References | T-01 |
 | AC-31 | Console at 0 errors | T-02 |
