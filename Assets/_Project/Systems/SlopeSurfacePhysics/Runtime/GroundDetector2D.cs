@@ -3,8 +3,8 @@ using UnityEngine;
 namespace KoeenjiDev.SlopeSurfacePhysics
 {
     /// <summary>
-    /// Queries and reports whether the Player currently has valid supporting
-    /// ground contact below its capsule.
+    /// Queries and reports the current surface contact below the Player capsule.
+    /// Call UpdateGroundState once per FixedUpdate before reading any property.
     /// </summary>
     public sealed class GroundDetector2D : MonoBehaviour
     {
@@ -30,11 +30,34 @@ namespace KoeenjiDev.SlopeSurfacePhysics
         [SerializeField, Min(0f)]
         private float groundedVerticalTolerance = 0.1f;
 
+        // ── Public state ──────────────────────────────────────────────────────
+
+        /// <summary>True when the capsule cast detected a supporting collider below the Player.</summary>
         public bool HasGroundContact { get; private set; }
-        public bool IsGrounded { get; private set; }
 
         /// <summary>
-        /// Performs the capsule cast and updates HasGroundContact and IsGrounded.
+        /// True when HasGroundContact is true and vertical velocity is within
+        /// the grounded tolerance (player is not jumping away from the surface).
+        /// </summary>
+        public bool IsGrounded { get; private set; }
+
+        /// <summary>Full contact snapshot from the most recent UpdateGroundState call.</summary>
+        public GroundContactData2D ContactData { get; private set; }
+
+        // ── Convenience pass-through properties ───────────────────────────────
+
+        public Vector2    ContactPoint    => ContactData.Point;
+        public Vector2    ContactNormal   => ContactData.Normal;
+        public Vector2    GroundTangent   => ContactData.Tangent;
+        public float      GroundAngle     => ContactData.Angle;
+        public float      GroundDistance  => ContactData.Distance;
+        public Collider2D GroundCollider  => ContactData.Collider;
+        public Rigidbody2D GroundRigidbody => ContactData.Rigidbody;
+
+        // ── Core update ───────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Performs the capsule cast and updates all contact properties.
         /// Call this at the start of PlayerSlopeController2D.FixedUpdate.
         /// </summary>
         public void UpdateGroundState()
@@ -56,7 +79,53 @@ namespace KoeenjiDev.SlopeSurfacePhysics
             );
 
             HasGroundContact = hit.collider != null;
-            IsGrounded = HasGroundContact && body.linearVelocity.y <= groundedVerticalTolerance;
+            IsGrounded       = HasGroundContact && body.linearVelocity.y <= groundedVerticalTolerance;
+
+            if (HasGroundContact)
+            {
+                float angle = Vector2.Angle(hit.normal, Vector2.up);
+
+                ContactData = new GroundContactData2D(
+                    hit.point,
+                    hit.normal,
+                    angle,
+                    hit.distance,
+                    hit.collider,
+                    hit.rigidbody
+                );
+            }
+            else
+            {
+                ContactData = GroundContactData2D.None;
+            }
+        }
+
+        // ── Gizmos ────────────────────────────────────────────────────────────
+
+        private void OnDrawGizmosSelected()
+        {
+            // Ground check direction — visible in Edit and Play mode.
+            if (playerCollider != null)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawRay(playerCollider.bounds.center, Vector2.down * groundCheckDistance);
+            }
+
+            // Contact data — only meaningful at runtime when ground is detected.
+            if (!Application.isPlaying || !HasGroundContact)
+                return;
+
+            // Contact point.
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(ContactData.Point, 0.05f);
+
+            // Surface normal (blue).
+            Gizmos.color = Color.blue;
+            Gizmos.DrawRay(ContactData.Point, ContactData.Normal * 0.5f);
+
+            // Surface tangent (red).
+            Gizmos.color = Color.red;
+            Gizmos.DrawRay(ContactData.Point, ContactData.Tangent * 0.5f);
         }
 
         private void OnValidate()
