@@ -2,7 +2,8 @@
   "name": "KoeenjiDev.SlopeSurfacePhysics",
   "rootNamespace": "KoeenjiDev.SlopeSurfacePhysics",
   "references": [
-    "KoeenjiDev.PlayerVisual"
+    "KoeenjiDev.PlayerVisual",
+    "Unity.InputSystem"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

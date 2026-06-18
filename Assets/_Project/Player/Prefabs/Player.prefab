@@ -46,6 +46,8 @@ GameObject:
   - component: {fileID: 2326760244070206929}
   - component: {fileID: 6788346563846791270}
   - component: {fileID: 4390036609966242176}
+  - component: {fileID: 5491941859440710080}
+  - component: {fileID: -2785146881063931733}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -131,8 +133,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.6, y: 1.4}
+  m_Offset: {x: 0, y: -0.05}
+  m_Size: {x: 0.5, y: 1.06}
   m_Direction: 0
 --- !u!114 &2326760244070206929
 MonoBehaviour:
@@ -160,11 +162,37 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents:
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: -2785146881063931733}
+        m_TargetAssemblyTypeName: KoeenjiDev.SlopeSurfacePhysics.PlayerSlopeController2D,
+          KoeenjiDev.SlopeSurfacePhysics
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 5d8b1e72-4c9a-4f3e-a6d2-8e7c4b1f9a20
     m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: -2785146881063931733}
+        m_TargetAssemblyTypeName: KoeenjiDev.SlopeSurfacePhysics.PlayerSlopeController2D,
+          KoeenjiDev.SlopeSurfacePhysics
+        m_MethodName: OnJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 9f2c6a84-1e7d-4b5c-8d3f-2a6e9c1b4f70
     m_ActionName: 'Player/Jump[/Keyboard/space]'
   m_NeverAutoSwitchControlSchemes: 0
@@ -197,6 +225,47 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: KoeenjiDev.CurrencySystem::KoeenjiDev.CurrencySystem.CurrencyCollector
   wallet: {fileID: 6788346563846791270}
+--- !u!114 &5491941859440710080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8519246956202271758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6f62d6fe024eec49b9af851760b760d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: KoeenjiDev.SlopeSurfacePhysics::KoeenjiDev.SlopeSurfacePhysics.GroundDetector2D
+  body: {fileID: 4322334262364779705}
+  playerCollider: {fileID: 415268980338292620}
+  groundProbe: {fileID: 5190148752635088691}
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  groundCheckDistance: 0.08
+  groundedVerticalTolerance: 0.1
+--- !u!114 &-2785146881063931733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8519246956202271758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbb422cdce6a7f14bac592892c7ecc90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: KoeenjiDev.SlopeSurfacePhysics::KoeenjiDev.SlopeSurfacePhysics.PlayerSlopeController2D
+  body: {fileID: 4322334262364779705}
+  groundDetector: {fileID: 5491941859440710080}
+  playerVisual: {fileID: 430901646068382458}
+  maximumSpeed: 7
+  groundAcceleration: 45
+  groundDeceleration: 55
+  jumpSpeed: 12
+  gravityAcceleration: 35
+  maximumFallSpeed: 20
 --- !u!1 &8743142264771668237
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,6 +362,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cf656f2681f4f594b98805e1128ff0aa, type: 3}
+--- !u!114 &430901646068382458 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7456750891617051368, guid: cf656f2681f4f594b98805e1128ff0aa, type: 3}
+  m_PrefabInstance: {fileID: 7098075082649507858}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b89c638f99775294e8185796687510e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KoeenjiDev.PlayerVisual.PlayerVisualController2D
 --- !u!4 &8009116930862923612 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 983883429550925646, guid: cf656f2681f4f594b98805e1128ff0aa, type: 3}
