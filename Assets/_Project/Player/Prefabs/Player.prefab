@@ -48,6 +48,7 @@ GameObject:
   - component: {fileID: 4390036609966242176}
   - component: {fileID: 5491941859440710080}
   - component: {fileID: -2785146881063931733}
+  - component: {fileID: 7171875604978935238}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -268,6 +269,21 @@ MonoBehaviour:
   jumpSpeed: 12
   gravityAcceleration: 35
   maximumFallSpeed: 20
+--- !u!114 &7171875604978935238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8519246956202271758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dded76588b781f449521cd467cbb4b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: KoeenjiDev.SlopeSurfacePhysics::KoeenjiDev.SlopeSurfacePhysics.SlopeSurfaceDebugGizmos2D
+  normalLength: 0.6
+  tangentLength: 0.6
+  contactRadius: 0.06
 --- !u!1 &8743142264771668237
 GameObject:
   m_ObjectHideFlags: 0

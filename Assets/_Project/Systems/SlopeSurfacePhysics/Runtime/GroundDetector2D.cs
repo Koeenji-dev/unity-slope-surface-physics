@@ -15,7 +15,9 @@ namespace KoeenjiDev.SlopeSurfacePhysics
         [Tooltip("CapsuleCollider2D on the Player root.")]
         [SerializeField] private CapsuleCollider2D playerCollider;
 
-        [Tooltip("Child transform positioned at the base of the capsule.")]
+        [Tooltip("Child transform positioned at the base of the capsule. " +
+                 "Used as a visual anchor for the GroundProbe child GameObject; " +
+                 "the capsule cast origin uses the collider bounds center.")]
         [SerializeField] private Transform groundProbe;
 
         [Tooltip("Layers that count as ground. Must include the Ground layer (7).")]
@@ -72,6 +74,14 @@ namespace KoeenjiDev.SlopeSurfacePhysics
         /// </summary>
         public void UpdateGroundState()
         {
+            if (body == null || playerCollider == null)
+            {
+                ContactData      = GroundContactData2D.None;
+                IsGroundWalkable = false;
+                IsGrounded       = false;
+                return;
+            }
+
             Vector3 lossyScale = playerCollider.transform.lossyScale;
             Vector2 worldSize = new Vector2(
                 playerCollider.size.x * Mathf.Abs(lossyScale.x),

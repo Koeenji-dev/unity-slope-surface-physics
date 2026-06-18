@@ -1468,8 +1468,8 @@ Transform:
   m_GameObject: {fileID: 940000001}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.39, y: -2.85, z: 0}
-  m_LocalScale: {x: 2.5, y: 0.4, z: 1}
+  m_LocalPosition: {x: -1.459, y: -2.988, z: 0}
+  m_LocalScale: {x: 3.40625, y: 0.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 332936074}
@@ -1592,10 +1592,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: KoeenjiDev.SlopeSurfacePhysics::KoeenjiDev.SlopeSurfacePhysics.SurfaceModifier2D
   surfaceType: 2
-  maxSpeedMultiplier: 0.6
-  accelerationMultiplier: 0.55
+  maxSpeedMultiplier: 0.2
+  accelerationMultiplier: 0.4
   decelerationMultiplier: 0.8
-  jumpForceMultiplier: 1
+  jumpForceMultiplier: 0.85
 --- !u!1 &950000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -1748,10 +1748,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: KoeenjiDev.SlopeSurfacePhysics::KoeenjiDev.SlopeSurfacePhysics.SurfaceModifier2D
   surfaceType: 3
-  maxSpeedMultiplier: 0.75
+  maxSpeedMultiplier: 0.5
   accelerationMultiplier: 0.7
-  decelerationMultiplier: 1.8
-  jumpForceMultiplier: 1
+  decelerationMultiplier: 3
+  jumpForceMultiplier: 0.5
 --- !u!1 &960000001
 GameObject:
   m_ObjectHideFlags: 0

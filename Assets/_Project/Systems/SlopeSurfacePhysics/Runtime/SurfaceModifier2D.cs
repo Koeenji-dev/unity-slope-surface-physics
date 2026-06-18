@@ -70,6 +70,10 @@ namespace KoeenjiDev.SlopeSurfacePhysics
         [ContextMenu("Apply Preset Values")]
         private void ApplyPresetValues()
         {
+#if UNITY_EDITOR
+            UnityEditor.Undo.RecordObject(this, "Apply Surface Preset");
+#endif
+
             switch (surfaceType)
             {
                 case SurfaceType2D.Normal:
@@ -103,6 +107,10 @@ namespace KoeenjiDev.SlopeSurfacePhysics
                     jumpForceMultiplier    = 2.00f;
                     break;
             }
+
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+#endif
         }
 
         private void OnValidate()

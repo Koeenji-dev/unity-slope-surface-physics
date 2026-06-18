@@ -73,6 +73,9 @@ namespace KoeenjiDev.SlopeSurfacePhysics
 
         private void FixedUpdate()
         {
+            if (body == null || groundDetector == null)
+                return;
+
             // 1. Update ground state first so IsGrounded is current.
             groundDetector.UpdateGroundState();
 
