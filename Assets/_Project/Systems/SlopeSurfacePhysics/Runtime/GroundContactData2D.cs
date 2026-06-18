@@ -40,17 +40,27 @@ namespace KoeenjiDev.SlopeSurfacePhysics
         public Rigidbody2D Rigidbody { get; }
 
         /// <summary>
+        /// SurfaceModifier2D found on the detected collider or its parents.
+        /// Null when the surface has no modifier (treated as Normal behavior).
+        /// </summary>
+        public SurfaceModifier2D SurfaceModifier { get; }
+
+        /// <summary>True when a SurfaceModifier2D was found on the detected surface.</summary>
+        public bool HasSurfaceModifier => SurfaceModifier != null;
+
+        /// <summary>
         /// Safe no-contact state.
         /// HasHit is false. Normal is Vector2.up. Tangent is Vector2.right.
         /// </summary>
         public static readonly GroundContactData2D None = new GroundContactData2D(
-            hasHit:    false,
-            point:     Vector2.zero,
-            normal:    Vector2.up,
-            angle:     0f,
-            distance:  0f,
-            collider:  null,
-            rigidbody: null
+            hasHit:          false,
+            point:           Vector2.zero,
+            normal:          Vector2.up,
+            angle:           0f,
+            distance:        0f,
+            collider:        null,
+            rigidbody:       null,
+            surfaceModifier: null
         );
 
         /// <summary>
@@ -62,16 +72,18 @@ namespace KoeenjiDev.SlopeSurfacePhysics
             float angle,
             float distance,
             Collider2D collider,
-            Rigidbody2D rigidbody)
+            Rigidbody2D rigidbody,
+            SurfaceModifier2D surfaceModifier)
         {
-            HasHit    = true;
-            Point     = point;
-            Normal    = normal;
-            Tangent   = new Vector2(normal.y, -normal.x);
-            Angle     = angle;
-            Distance  = distance;
-            Collider  = collider;
-            Rigidbody = rigidbody;
+            HasHit          = true;
+            Point           = point;
+            Normal          = normal;
+            Tangent         = new Vector2(normal.y, -normal.x);
+            Angle           = angle;
+            Distance        = distance;
+            Collider        = collider;
+            Rigidbody       = rigidbody;
+            SurfaceModifier = surfaceModifier;
         }
 
         private GroundContactData2D(
@@ -81,16 +93,18 @@ namespace KoeenjiDev.SlopeSurfacePhysics
             float angle,
             float distance,
             Collider2D collider,
-            Rigidbody2D rigidbody)
+            Rigidbody2D rigidbody,
+            SurfaceModifier2D surfaceModifier)
         {
-            HasHit    = hasHit;
-            Point     = point;
-            Normal    = normal;
-            Tangent   = new Vector2(normal.y, -normal.x);
-            Angle     = angle;
-            Distance  = distance;
-            Collider  = collider;
-            Rigidbody = rigidbody;
+            HasHit          = hasHit;
+            Point           = point;
+            Normal          = normal;
+            Tangent         = new Vector2(normal.y, -normal.x);
+            Angle           = angle;
+            Distance        = distance;
+            Collider        = collider;
+            Rigidbody       = rigidbody;
+            SurfaceModifier = surfaceModifier;
         }
     }
 }

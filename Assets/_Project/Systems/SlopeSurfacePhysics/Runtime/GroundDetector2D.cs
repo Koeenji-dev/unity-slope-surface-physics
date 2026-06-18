@@ -94,13 +94,17 @@ namespace KoeenjiDev.SlopeSurfacePhysics
             {
                 float angle = Vector2.Angle(hit.normal, Vector2.up);
 
+                SurfaceModifier2D modifier =
+                    hit.collider.GetComponentInParent<SurfaceModifier2D>();
+
                 ContactData      = new GroundContactData2D(
                     hit.point,
                     hit.normal,
                     angle,
                     hit.distance,
                     hit.collider,
-                    hit.rigidbody
+                    hit.rigidbody,
+                    modifier
                 );
 
                 IsGroundWalkable = GroundAngle <= maxWalkableSlopeAngle;

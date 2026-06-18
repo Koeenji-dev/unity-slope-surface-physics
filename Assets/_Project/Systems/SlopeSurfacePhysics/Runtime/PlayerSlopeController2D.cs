@@ -102,7 +102,17 @@ namespace KoeenjiDev.SlopeSurfacePhysics
         {
             Vector2 slopeDirection = GetGroundMovementDirection();
 
-            float targetSpeed = horizontalInput * maximumSpeed;
+            // Read surface modifier from the current contact. Null means Normal (all 1f).
+            SurfaceModifier2D modifier = groundDetector.ContactData.SurfaceModifier;
+            float speedMult  = modifier != null ? modifier.MaxSpeedMultiplier      : 1f;
+            float accelMult  = modifier != null ? modifier.AccelerationMultiplier  : 1f;
+            float decelMult  = modifier != null ? modifier.DecelerationMultiplier  : 1f;
+
+            float effectiveMaxSpeed    = maximumSpeed      * speedMult;
+            float effectiveAcceleration = groundAcceleration * accelMult;
+            float effectiveDeceleration = groundDeceleration * decelMult;
+
+            float targetSpeed = horizontalInput * effectiveMaxSpeed;
 
             // Moving uphill means the actual travel direction has a positive Y component.
             Vector2 actualMoveDirection = slopeDirection * Mathf.Sign(targetSpeed);
@@ -112,8 +122,8 @@ namespace KoeenjiDev.SlopeSurfacePhysics
             // Project current velocity onto the slope to get the scalar starting point.
             float currentSpeed = Vector2.Dot(velocity, slopeDirection);
             float rate = Mathf.Approximately(horizontalInput, 0f)
-                ? groundDeceleration
-                : groundAcceleration;
+                ? effectiveDeceleration
+                : effectiveAcceleration;
 
             movementSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, rate * Time.fixedDeltaTime);
 
@@ -133,7 +143,9 @@ namespace KoeenjiDev.SlopeSurfacePhysics
 
             if (jumped)
             {
-                velocity.y = jumpSpeed;
+                SurfaceModifier2D modifier = groundDetector.ContactData.SurfaceModifier;
+                float jumpMult = modifier != null ? modifier.JumpForceMultiplier : 1f;
+                velocity.y = jumpSpeed * jumpMult;
             }
             else
             {
